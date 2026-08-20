@@ -42,9 +42,13 @@ function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-export async function upsertGoogleUser(user: GoogleUser): Promise<UserDoc | null> {
+export async function upsertGoogleUser(user: GoogleUser, currentIndempotencyKey: number): Promise<UserDoc | null> {
   try {
     await connectToDatabase();
+    const currentUser = await getUserModel().findOne({ email: user.email }).lean();
+    if (currentUser && currentUser.lastIndempotencyKey === currentIndempotencyKey) {
+      return currentUser;
+    }
     const doc = await getUserModel()
       .findOneAndUpdate(
         { email: user.email },
@@ -54,13 +58,12 @@ export async function upsertGoogleUser(user: GoogleUser): Promise<UserDoc | null
             googleId: user.googleId,
             provider: "google",
           },
-          $set: { name: user.name, image: user.image ?? null },
+          $set: { name: user.name, image: user.image ?? null, lastIndempotencyKey: currentIndempotencyKey },
           $inc: { signInCount: 1 },
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
       )
       .lean();
-    console.log("this fnc")
     return doc;
   } catch (err) {
     console.error(`[db] failed to upsert user ${user.email}: ${errorMessage(err)}`);
