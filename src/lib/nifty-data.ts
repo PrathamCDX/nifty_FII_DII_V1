@@ -1,5 +1,6 @@
 import YahooFinance from "yahoo-finance2";
 import axios from "axios";
+import { readFiiDiiMap, syncFiiDii, type FiiDiiRow } from "./fii-dii";
 
 export type DailyRecord = {
   date: string;
@@ -152,7 +153,35 @@ export async function getDailySeries(): Promise<DailyRecord[]> {
   if (seriesCache && Date.now() < seriesCache.expiresAt) {
     return seriesCache.records;
   }
-  const [yahoo, institutional] = await Promise.all([fetchYahooDaily(), fetchInstitutional()]);
+  const yahoo = await fetchYahooDaily();
+  const dbMap = await readFiiDiiMap();
+  const institutional =
+    dbMap === null || dbMap.size === 0 ? await fetchInstitutional() : dbMap;
+
+  const needsBackfill = dbMap !== null && dbMap.size === 0;
+  if (dbMap !== null && dbMap.size > 0) {
+    const lastDbDate = [...dbMap.keys()].sort()[dbMap.size - 1] ?? null;
+    const newestYahooDate = yahoo.length > 0 ? yahoo[yahoo.length - 1].date : null;
+    if (lastDbDate !== null && newestYahooDate !== null && lastDbDate < newestYahooDate) {
+      const chartist = await fetchInstitutional();
+      const fresh: Map<string, { fii: number; dii: number }> = new Map();
+      for (const [date, value] of chartist) {
+        if (date > lastDbDate) {
+          fresh.set(date, value);
+          institutional.set(date, value);
+        }
+      }
+      if (fresh.size > 0) {
+        const rows: FiiDiiRow[] = [...fresh].map(([date, value]) => ({
+          date,
+          fii: value.fii,
+          dii: value.dii,
+        }));
+        await syncFiiDii(rows);
+      }
+    }
+  }
+
   const records = yahoo
     .map((bar) => {
       const inst = institutional.get(bar.date);
@@ -162,6 +191,19 @@ export async function getDailySeries(): Promise<DailyRecord[]> {
       return { ...bar, fii, dii, net };
     })
     .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (needsBackfill) {
+    const rows = records
+      .filter(
+        (record): record is DailyRecord & { fii: number; dii: number } =>
+          record.fii !== null && record.dii !== null
+      )
+      .map((record) => ({ date: record.date, fii: record.fii, dii: record.dii }));
+    if (rows.length > 0) {
+      void syncFiiDii(rows);
+    }
+  }
+
   lastGoodSeries = records;
   seriesCache = { records, expiresAt: Date.now() + CACHE_TTL_MS };
   return records;

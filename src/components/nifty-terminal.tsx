@@ -270,7 +270,7 @@ export default function NiftyTerminal() {
 
   if (isError) {
     return (
-      <main className="flex h-screen items-center justify-center bg-[#0a0e13] px-6">
+      <main className="flex h-full items-center justify-center bg-[#0a0e13] px-6">
         <div className="max-w-md text-center">
           <p className="text-sm text-slate-400">Unable to load NIFTY data.</p>
           <p className="mt-2 text-xs text-slate-600">
@@ -303,7 +303,7 @@ export default function NiftyTerminal() {
     active.net !== null ? (active.net >= 0 ? COLORS.netPos : COLORS.netNeg) : COLORS.textDim;
 
   return (
-    <main className="flex h-screen flex-col overflow-hidden bg-[#0a0e13] text-slate-200">
+    <main className="flex h-full flex-col overflow-hidden bg-[#0a0e13] text-slate-200">
       <header className="px-5 pt-4 pb-2">
         <div className="flex items-end justify-between gap-6">
           <div>
