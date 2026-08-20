@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { signOut } from "next-auth/react";
 
@@ -12,18 +12,23 @@ type TokenResponse = {
   user: { name: string; email: string; image: string | null };
 };
 
-async function fetchToken(): Promise<TokenResponse> {
-  const response = await axios.get<TokenResponse>("/api/auth/jwt");
+async function fetchToken(idempotencyKey: number): Promise<TokenResponse> {
+  const response = await axios.get<TokenResponse>("/api/auth/jwt", {
+    headers: {
+      "Idempotency-Key": idempotencyKey,
+    },
+  });
   return response.data;
 }
 
 export function SignedInBar() {
+  const idempotencyKeyRef = useRef<number>(new Date().getTime());
   const [user, setUser] = useState<TokenResponse["user"] | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
     let cancelled = false;
-    fetchToken()
+    fetchToken(idempotencyKeyRef.current)
       .then((data) => {
         if (cancelled) return;
         localStorage.setItem(TOKEN_STORAGE_KEY, data.token);

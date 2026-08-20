@@ -14,6 +14,8 @@ type UserDoc = {
   image: string | null;
   googleId: string;
   provider: string;
+  signInCount: number;
+  lastIndempotencyKey: number;
 };
 
 type UserModel = mongoose.Model<UserDoc>;
@@ -25,6 +27,8 @@ const userSchema = new mongoose.Schema<UserDoc>(
     image: { type: String, default: null },
     googleId: { type: String, required: true, unique: true, sparse: true },
     provider: { type: String, required: true, default: "google" },
+    signInCount: { type: Number, default: 0 },
+    lastIndempotencyKey: { type: Number, default: 0 },
   },
   { timestamps: true, collection: "users" }
 );
@@ -51,10 +55,12 @@ export async function upsertGoogleUser(user: GoogleUser): Promise<UserDoc | null
             provider: "google",
           },
           $set: { name: user.name, image: user.image ?? null },
+          $inc: { signInCount: 1 },
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
       )
       .lean();
+    console.log("this fnc")
     return doc;
   } catch (err) {
     console.error(`[db] failed to upsert user ${user.email}: ${errorMessage(err)}`);
