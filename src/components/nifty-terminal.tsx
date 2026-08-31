@@ -354,8 +354,8 @@ export default function NiftyTerminal() {
         </div>
       </header>
 
-      <section className="w-full overflow-hidden border-t border-white/[0.06] bg-[#0d1219]/70 py-2">
-        <div className="-mr-5 flex w-max min-w-full items-center gap-x-6 overflow-x-auto whitespace-nowrap px-5 pb-1 font-mono text-[11px] [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-600">
+      <section className="w-full border-t overflow-x-auto border-white/[0.06] bg-[#0d1219]/70 py-2">
+        <div className="-mr-5  flex w-max min-w-full items-center gap-x-6 overflow-x-auto whitespace-nowrap px-5 pb-1 font-mono text-[11px] [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-600">
           <Stat label="Date" value={formatDate(active.date)} valueColor={COLORS.text} />
           <Stat label="Open" value={formatPrice(active.open)} />
           <Stat label="High" value={formatPrice(active.high)} valueColor={COLORS.up} />
