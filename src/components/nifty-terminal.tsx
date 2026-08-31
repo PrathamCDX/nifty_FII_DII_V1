@@ -332,25 +332,27 @@ export default function NiftyTerminal() {
             </div>
           </div>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-white/[0.06] pt-2.5">
-          {LEGEND.map((item) => (
-            <span
-              key={item.label}
-              className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-500"
-            >
+        {firstInstitutional && (
+          <span className="mt-3 block border-t border-white/[0.06] pt-2 text-[10px] text-slate-600">
+            Institutional data from {formatDate(firstInstitutional)} · NSE
+            (cash)
+          </span>
+        )}
+        <div className="flex items-center pt-2.5">
+          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-x-5 overflow-x-auto [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-600">
+            {LEGEND.map((item) => (
               <span
-                className="inline-block h-2 w-2 rounded-[2px]"
-                style={{ background: item.color }}
-              />
-              {item.label}
-            </span>
-          ))}
-          {firstInstitutional && (
-            <span className="ml-auto text-[10px] text-slate-600">
-              Institutional data from {formatDate(firstInstitutional)} · NSE
-              (cash)
-            </span>
-          )}
+                key={item.label}
+                className="flex shrink-0 items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-500"
+              >
+                <span
+                  className="inline-block h-2 w-2 rounded-[2px]"
+                  style={{ background: item.color }}
+                />
+                {item.label}
+              </span>
+            ))}
+          </div>
         </div>
       </header>
 
