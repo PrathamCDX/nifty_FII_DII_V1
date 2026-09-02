@@ -400,6 +400,8 @@ export default function NiftyTerminal() {
   );
 }
 
+
+
 function Stat({
   label,
   value,
