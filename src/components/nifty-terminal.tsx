@@ -339,7 +339,7 @@ export default function NiftyTerminal() {
           </span>
         )}
         <div className="flex items-center pt-2.5">
-          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-x-5 overflow-x-auto [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-600">
+          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-x-5 overflow-x-auto hide-scrollbar">
             {LEGEND.map((item) => (
               <span
                 key={item.label}
@@ -357,7 +357,7 @@ export default function NiftyTerminal() {
       </header>
 
       <section className="w-full border-t overflow-x-auto border-white/[0.06] bg-[#0d1219]/70 py-2">
-        <div className="-mr-5  flex w-max min-w-full items-center gap-x-6 overflow-x-auto whitespace-nowrap px-5 pb-1 font-mono text-[11px] [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-600">
+        <div className="-mr-5  flex w-max min-w-full items-center gap-x-6 overflow-x-auto whitespace-nowrap px-5 pb-1 font-mono text-[11px] hide-scrollbar">
           <Stat label="Date" value={formatDate(active.date)} valueColor={COLORS.text} />
           <Stat label="Open" value={formatPrice(active.open)} />
           <Stat label="High" value={formatPrice(active.high)} valueColor={COLORS.up} />
